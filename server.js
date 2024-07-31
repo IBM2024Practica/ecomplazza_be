@@ -76,7 +76,9 @@ app.get('/api/products', (req, res) => {
     res.status(404).json({ error: 'Products not found' });
   }
 });
-
+app.get('/status', (req, res) => {
+    res.send('Server is running and accessible.');
+});
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });
