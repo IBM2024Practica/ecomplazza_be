@@ -3,6 +3,7 @@ const router = express.Router();
 const User = require('../models/User');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const auth = require('../middleware/auth');
 const { check, validationResult } = require('express-validator');
 require('dotenv').config();
 
@@ -53,7 +54,14 @@ router.post(
         { expiresIn: '5d' },
         (err, token) => {
           if (err) throw err;
-          res.json({ token });
+          // Set the token in an HttpOnly cookie
+          res.cookie('token', token, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production', // Set to true in production
+            maxAge: 5 * 24 * 60 * 60 * 1000, // 5 days
+            sameSite: 'strict'
+          });
+          res.status(201).json({ user: payload.user });
         }
       );
     } catch (err) {
@@ -103,7 +111,14 @@ router.post(
         { expiresIn: '5d' },
         (err, token) => {
           if (err) throw err;
-          res.json({ token, user: payload.user });
+          // Set the token in an HttpOnly cookie
+          res.cookie('token', token, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production', // Set to true in production
+            maxAge: 5 * 24 * 60 * 60 * 1000, // 5 days
+            sameSite: 'strict'
+          });
+          res.status(200).json({ user: payload.user });
         }
       );
     } catch (err) {
@@ -112,5 +127,15 @@ router.post(
     }
   }
 );
+
+// Logout User
+router.post('/logout', auth, (req, res) => {
+  res.clearCookie('token', {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'strict'
+  });
+  res.json({ msg: 'Logout successful' });
+});
 
 module.exports = router;

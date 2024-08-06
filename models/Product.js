@@ -9,7 +9,7 @@ const ProductSchema = new mongoose.Schema({
   description: { type: String, required: true },
   imageUrl: { type: String, required: true },
   material:  {type : String, required : true}, 
- color : {type : String, required : true},  
+  color : {type : String, required : true},  
   //date: { type: Date, default: Date.now },
   favourite: { type: Boolean, default: false },
   sizes: [

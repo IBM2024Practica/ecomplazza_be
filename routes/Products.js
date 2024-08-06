@@ -17,14 +17,18 @@ const upload = multer({ storage: storage });
 
 // Add Product
 router.post(
-  '/', // endpoint la pagina de home 
+  '/', 
   [auth, upload.single('image')],
   [
     check('name', 'Name is required').not().isEmpty(),
     check('price', 'Price is required').isNumeric(),
+    check('brand', 'Brand is required').not().isEmpty(),
     check('category', 'Category is required').not().isEmpty(),
+    check('subcategory', 'Subcategory is required').not().isEmpty(),
     check('description', 'Description is required').not().isEmpty(),
-    check('quantity', 'Quantity is required').isNumeric(),
+    check('material', 'Material is required').not().isEmpty(),
+    check('color', 'Color is required').not().isEmpty(),
+    check('sizes.*.quantity', 'Sizes quantity is required').isNumeric(),
   ],
   async (req, res) => {
     const errors = validationResult(req);
@@ -32,17 +36,21 @@ router.post(
       return res.status(400).json({ errors: errors.array() });
     }
 
-    const { name, price, category, description, quantity } = req.body;
+    const { name, price, brand, category, subcategory, description, material, color, sizes } = req.body;
     const imageUrl = req.file ? req.file.path : '';
 
     try {
       const newProduct = new Product({
         name,
         price,
+        brand,
         category,
+        subcategory,
         description,
         imageUrl,
-        quantity,
+        material,
+        color,
+        sizes,
       });
 
       const product = await newProduct.save();
@@ -61,9 +69,13 @@ router.put(
   [
     check('name', 'Name is required').not().isEmpty(),
     check('price', 'Price is required').isNumeric(),
+    check('brand', 'Brand is required').not().isEmpty(),
     check('category', 'Category is required').not().isEmpty(),
+    check('subcategory', 'Subcategory is required').not().isEmpty(),
     check('description', 'Description is required').not().isEmpty(),
-    check('quantity', 'Quantity is required').isNumeric(),
+    check('material', 'Material is required').not().isEmpty(),
+    check('color', 'Color is required').not().isEmpty(),
+    check('sizes.*.quantity', 'Sizes quantity is required').isNumeric(),
   ],
   async (req, res) => {
     const errors = validationResult(req);
@@ -71,7 +83,7 @@ router.put(
       return res.status(400).json({ errors: errors.array() });
     }
 
-    const { name, price, category, description, quantity } = req.body;
+    const { name, price, brand, category, subcategory, description, material, color, sizes } = req.body;
     const imageUrl = req.file ? req.file.path : '';
 
     try {
@@ -83,9 +95,14 @@ router.put(
 
       product.name = name;
       product.price = price;
+      product.brand = brand;
       product.category = category;
+      product.subcategory = subcategory;
       product.description = description;
-      product.quantity = quantity;
+      product.material = material;
+      product.color = color;
+      product.sizes = sizes;
+
       if (imageUrl) {
         product.imageUrl = imageUrl;
       }

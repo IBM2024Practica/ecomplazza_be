@@ -5,13 +5,14 @@ const auth = require('../middleware/auth');
 
 // Place Order
 router.post('/', auth, async (req, res) => {
-  const { products, total } = req.body;
+  const { products, total, address } = req.body; 
 
   try {
     const newOrder = new Order({
       user: req.user.id,
       products,
-      total
+      total,
+      address, 
     });
 
     const order = await newOrder.save();
