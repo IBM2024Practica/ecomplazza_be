@@ -118,13 +118,17 @@ router.put(
 
 
 // routes/products.js
+// routes/products.js
 router.get('/products', async (req, res) => {
   try {
-    const { category, subcategory } = req.query;
+    const { category, subcategory, minPrice, maxPrice, material } = req.query;
     const query = {};
 
     if (category) query.category = new RegExp(`^${category}$`, 'i');
-    if (subcategory) query.subcategory = new RegExp(`^${subcategory}$`, 'i');
+    if (subcategory) query.subcategory = { $in: subcategory.split(',') };
+    if (minPrice) query.price = { $gte: Number(minPrice) };
+    if (maxPrice) query.price = { ...query.price, $lte: Number(maxPrice) };
+    if (material) query.material = { $in: material.split(',') };
 
     const products = await Product.find(query);
     res.json(products);
@@ -133,6 +137,7 @@ router.get('/products', async (req, res) => {
     res.status(500).send('Server error');
   }
 });
+
 
 
 
