@@ -7,7 +7,7 @@ const ProductSchema = new mongoose.Schema({
   category: { type: String, required: true },
   subcategory : {type : String, required : true},
   description: { type: String, required: true },
-  imageUrl: { type: String, required: true },
+//  imageUrl: { type: String, required: true },
   material:  {type : String, required : true}, 
   color : {type : String, required : true},  
   //date: { type: Date, default: Date.now },

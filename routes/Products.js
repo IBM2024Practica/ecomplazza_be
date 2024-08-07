@@ -37,7 +37,7 @@ router.post(
     }
 
     const { name, price, brand, category, subcategory, description, material, color, sizes } = req.body;
-    const imageUrl = req.file ? req.file.path : '';
+  //  const imageUrl = req.file ? req.file.path : '';
 
     try {
       const newProduct = new Product({
@@ -47,7 +47,7 @@ router.post(
         category,
         subcategory,
         description,
-        imageUrl,
+//        imageUrl,
         material,
         color,
         sizes,
@@ -117,14 +117,24 @@ router.put(
 );
 
 // Get Products
-router.get('/', async (req, res) => {
+// Get Products by Category and Subcategory
+router.get('/products', async (req, res) => {
   try {
-    const products = await Product.find();
+    const { category, subcategory } = req.query;
+    const query = {};
+
+    if (category) query.category = category;
+    if (subcategory) query.subcategory = subcategory;
+
+    console.log('Query parameters:', req.query);
+    const products = await Product.find(query);
+    console.log('Products found:', products);
     res.json(products);
   } catch (err) {
     console.error(err.message);
     res.status(500).send('Server error');
   }
 });
+
 
 module.exports = router;
