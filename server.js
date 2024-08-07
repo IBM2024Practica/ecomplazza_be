@@ -25,7 +25,10 @@ mongoose.connect(process.env.MONGO_URI, {
 .catch(err => console.error('MongoDB connection error:', err));
 
 // Middleware
-app.use(cors());
+app.use(cors({
+  origin: 'http://localhost:3000', // sau URL-ul frontend-ului tău
+  credentials: true
+}));
 app.use(cookieParser());
 app.use(express.json()); // For parsing JSON request bodies
 

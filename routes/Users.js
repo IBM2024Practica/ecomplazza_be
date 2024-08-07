@@ -53,17 +53,17 @@ router.post(
         process.env.JWT_SECRET,
         { expiresIn: '5d' },
         (err, token) => {
-          if (err) throw err;
-          // Set the token in an HttpOnly cookie
-          res.cookie('token', token, {
-            httpOnly: true,
-            secure: process.env.NODE_ENV === 'production', // Set to true in production
-            maxAge: 5 * 24 * 60 * 60 * 1000, // 5 days
-            sameSite: 'strict'
-          });
-          res.status(201).json({ user: payload.user });
+            if (err) throw err;
+            res.cookie('token', token, {
+                httpOnly: true,
+                secure: process.env.NODE_ENV === 'production',
+                maxAge: 5 * 24 * 60 * 60 * 1000,
+                sameSite: 'strict'
+            });
+            res.status(200).json({ user: payload.user });
         }
       );
+    
     } catch (err) {
       console.error(err.message);
       res.status(500).send('Server error');
@@ -110,17 +110,17 @@ router.post(
         process.env.JWT_SECRET,
         { expiresIn: '5d' },
         (err, token) => {
-          if (err) throw err;
-          // Set the token in an HttpOnly cookie
-          res.cookie('token', token, {
-            httpOnly: true,
-            secure: process.env.NODE_ENV === 'production', // Set to true in production
-            maxAge: 5 * 24 * 60 * 60 * 1000, // 5 days
-            sameSite: 'strict'
-          });
-          res.status(200).json({ user: payload.user });
+            if (err) throw err;
+            res.cookie('token', token, {
+                httpOnly: true,
+                secure: process.env.NODE_ENV === 'production',
+                maxAge: 5 * 24 * 60 * 60 * 1000,
+                sameSite: 'strict'
+            });
+            res.status(200).json({ user: payload.user });
         }
       );
+    
     } catch (err) {
       console.error(err.message);
       res.status(500).send('Server error');
@@ -128,8 +128,15 @@ router.post(
   }
 );
 
+// Check authentication status
+router.get('/check-auth', auth, (req, res) => {
+  console.log('Check Auth Route Hit');
+  res.json({ user: req.user });
+});
+
 // Logout User
 router.post('/logout', auth, (req, res) => {
+  console.log('Logout endpoint hit');
   res.clearCookie('token', {
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
@@ -137,5 +144,4 @@ router.post('/logout', auth, (req, res) => {
   });
   res.json({ msg: 'Logout successful' });
 });
-
 module.exports = router;
