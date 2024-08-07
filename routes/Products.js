@@ -4,10 +4,12 @@ const Product = require('../models/Product');
 const auth = require('../middleware/auth');
 const { check, validationResult } = require('express-validator');
 const multer = require('multer');
+const path = require('path');
 
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    cb(null, 'uploads/');
+    const dir = path.join(__dirname, '../uploads');
+    cb(null, dir);
   },
   filename: function (req, file, cb) {
     cb(null, Date.now() + '-' + file.originalname);
@@ -37,7 +39,7 @@ router.post(
     }
 
     const { name, price, brand, category, subcategory, description, material, color, sizes } = req.body;
-  //  const imageUrl = req.file ? req.file.path : '';
+    const imageUrl = req.file ? `/uploads/${req.file.filename}` : '';
 
     try {
       const newProduct = new Product({
@@ -47,7 +49,7 @@ router.post(
         category,
         subcategory,
         description,
-//        imageUrl,
+        imageUrl,
         material,
         color,
         sizes,
@@ -61,7 +63,6 @@ router.post(
     }
   }
 );
-
 // Update Product
 router.put(
   '/:id',

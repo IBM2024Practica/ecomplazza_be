@@ -24,14 +24,21 @@ router.post('/', auth, async (req, res) => {
 });
 
 // Get Orders
+// routes/orders.js
 router.get('/', auth, async (req, res) => {
   try {
-    const orders = await Order.find({ user: req.user.id }).populate('products');
+    let orders;
+    if (req.user.role === 'admin' || req.user.role === 'distributor') {
+      orders = await Order.find().populate('user products');
+    } else {
+      orders = await Order.find({ user: req.user.id }).populate('products');
+    }
     res.json(orders);
   } catch (err) {
     console.error(err.message);
     res.status(500).send('Server error');
   }
 });
+
 
 module.exports = router;

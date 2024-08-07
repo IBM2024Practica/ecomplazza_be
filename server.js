@@ -4,6 +4,7 @@ const cors = require('cors');
 const mongoose = require('mongoose');
 const dotenv = require('dotenv');
 const cookieParser = require('cookie-parser');
+const path = require('path');
 
 dotenv.config();
 
@@ -47,6 +48,7 @@ app.use('/api/orders', orderRoutes);     // Orders route
 
 app.use(express.static('public'));
 
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 app.get('/api/hello', (req, res) => {
   res.json({ message: 'Hello from Express!' });
