@@ -3,7 +3,6 @@ const router = express.Router();
 const User = require('../models/User');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-const auth = require('../middleware/auth');
 const { check, validationResult } = require('express-validator');
 require('dotenv').config();
 
@@ -33,7 +32,7 @@ router.post(
         username,
         email,
         password,
-        role
+        role,
       });
 
       const salt = await bcrypt.genSalt(10);
@@ -44,8 +43,8 @@ router.post(
       const payload = {
         user: {
           id: user.id,
-          role: user.role
-        }
+          role: user.role,
+        },
       };
 
       jwt.sign(
@@ -53,17 +52,10 @@ router.post(
         process.env.JWT_SECRET,
         { expiresIn: '5d' },
         (err, token) => {
-            if (err) throw err;
-            res.cookie('token', token, {
-                httpOnly: true,
-                secure: process.env.NODE_ENV === 'production',
-                maxAge: 5 * 24 * 60 * 60 * 1000,
-                sameSite: 'strict'
-            });
-            res.status(200).json({ user: payload.user });
+          if (err) throw err;
+          res.status(201).json({ token, user: payload.user });
         }
       );
-    
     } catch (err) {
       console.error(err.message);
       res.status(500).send('Server error');
@@ -76,7 +68,7 @@ router.post(
   '/login',
   [
     check('email', 'Please include a valid email').isEmail(),
-    check('password', 'Password is required').exists()
+    check('password', 'Password is required').exists(),
   ],
   async (req, res) => {
     const errors = validationResult(req);
@@ -101,8 +93,8 @@ router.post(
         user: {
           id: user.id,
           name: user.username,
-          role: user.role
-        }
+          role: user.role,
+        },
       };
 
       jwt.sign(
@@ -110,17 +102,10 @@ router.post(
         process.env.JWT_SECRET,
         { expiresIn: '5d' },
         (err, token) => {
-            if (err) throw err;
-            res.cookie('token', token, {
-                httpOnly: true,
-                secure: process.env.NODE_ENV === 'production',
-                maxAge: 5 * 24 * 60 * 60 * 1000,
-                sameSite: 'strict'
-            });
-            res.status(200).json({ user: payload.user });
+          if (err) throw err;
+          res.status(200).json({ token, user: payload.user });
         }
       );
-    
     } catch (err) {
       console.error(err.message);
       res.status(500).send('Server error');
@@ -128,20 +113,4 @@ router.post(
   }
 );
 
-// Check authentication status
-router.get('/check-auth', auth, (req, res) => {
-  console.log('Check Auth Route Hit');
-  res.json({ user: req.user });
-});
-
-// Logout User
-router.post('/logout', auth, (req, res) => {
-  console.log('Logout endpoint hit');
-  res.clearCookie('token', {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
-    sameSite: 'strict'
-  });
-  res.json({ msg: 'Logout successful' });
-});
 module.exports = router;
