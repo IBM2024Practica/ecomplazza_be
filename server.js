@@ -26,7 +26,10 @@ mongoose.connect(process.env.MONGO_URI, {
 
 // Middleware
 app.use(cors({
-  origin: 'https://ecomplazza-fe.vercel.app', // sau URL-ul frontend-ului tău
+  origin: [
+    'https://ecomplazza-fe.vercel.app', // URL-ul frontend-ului tău de producție
+    'http://localhost:3000' // URL-ul pentru dezvoltare locală
+  ],
   credentials: true
 }));
 app.use(cookieParser());

@@ -116,25 +116,24 @@ router.put(
   }
 );
 
-// Get Products
-// Get Products by Category and Subcategory
+
+// routes/products.js
 router.get('/products', async (req, res) => {
   try {
     const { category, subcategory } = req.query;
     const query = {};
 
-    if (category) query.category = category;
-    if (subcategory) query.subcategory = subcategory;
+    if (category) query.category = new RegExp(`^${category}$`, 'i');
+    if (subcategory) query.subcategory = new RegExp(`^${subcategory}$`, 'i');
 
-    console.log('Query parameters:', req.query);
     const products = await Product.find(query);
-    console.log('Products found:', products);
     res.json(products);
   } catch (err) {
     console.error(err.message);
     res.status(500).send('Server error');
   }
 });
+
 
 
 module.exports = router;
