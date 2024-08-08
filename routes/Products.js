@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const Product = require('../models/Product');
+const User = require('../models/User');
 const auth = require('../middleware/auth');
 const { check, validationResult } = require('express-validator');
 const multer = require('multer');
@@ -63,6 +64,7 @@ router.post(
     }
   }
 );
+
 // Update Product
 router.put(
   '/:id',
@@ -117,8 +119,6 @@ router.put(
   }
 );
 
-
-// routes/products.js
 // routes/products.js
 router.get('/products', async (req, res) => {
   try {
@@ -139,6 +139,78 @@ router.get('/products', async (req, res) => {
   }
 });
 
+// Add to Favourites
+router.post('/favourites/add/:productId', auth, async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const productId = req.params.productId;
+
+    const product = await Product.findById(productId);
+    if (!product) {
+      return res.status(404).json({ msg: 'Product not found' });
+    }
+
+    // Add product to user's favourites
+    await User.findByIdAndUpdate(userId, {
+      $addToSet: { favourites: productId }
+    });
+
+    // Add user to product's favouritedBy list
+    await Product.findByIdAndUpdate(productId, {
+      $addToSet: { favouritedBy: userId }
+    });
+
+    res.json({ msg: 'Product added to favourites' });
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send('Server error');
+  }
+});
+
+// Remove from Favourites
+router.post('/favourites/remove/:productId', auth, async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const productId = req.params.productId;
+
+    const product = await Product.findById(productId);
+    if (!product) {
+      return res.status(404).json({ msg: 'Product not found' });
+    }
+
+    // Remove product from user's favourites
+    await User.findByIdAndUpdate(userId, {
+      $pull: { favourites: productId }
+    });
+
+    // Remove user from product's favouritedBy list
+    await Product.findByIdAndUpdate(productId, {
+      $pull: { favouritedBy: userId }
+    });
+
+    res.json({ msg: 'Product removed from favourites' });
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send('Server error');
+  }
+});
+
+// Get User's Favourites
+router.get('/favourites', auth, async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const user = await User.findById(userId).populate('favourites'); // Populate the favourites field with product details
+
+    if (!user) {
+      return res.status(404).json({ msg: 'User not found' });
+    }
+
+    res.json(user.favourites);
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send('Server error');
+  }
+});
 
 
 

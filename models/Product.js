@@ -16,7 +16,8 @@ const ProductSchema = new mongoose.Schema({
       size: { type: String, required: false }, // XS, S, M, L, XL
       quantity: { type: Number, required: true, default: 0 } // Cantitatea pentru acea mărime
     }
-  ]
+  ],
+  favouritedBy: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }] 
 });
 
 module.exports = mongoose.model('Product', ProductSchema);

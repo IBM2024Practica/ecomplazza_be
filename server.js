@@ -3,11 +3,7 @@ const express = require('express');
 const cors = require('cors');
 const mongoose = require('mongoose');
 const dotenv = require('dotenv');
-<<<<<<< HEAD
-=======
-const cookieParser = require('cookie-parser');
 const path = require('path');
->>>>>>> 1947432b7290a915bf990a373aaa9b55161ea685
 
 dotenv.config();
 
