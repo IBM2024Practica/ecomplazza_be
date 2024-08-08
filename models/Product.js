@@ -7,10 +7,9 @@ const ProductSchema = new mongoose.Schema({
   category: { type: String, required: true },
   subcategory : {type : String, required : true},
   description: { type: String, required: true },
-//  imageUrl: { type: String, required: true },
+  imageUrl: { type: String, required: true }, // Adăugat câmpul pentru imagine
   material:  {type : String, required : true}, 
   color : {type : String, required : true},  
-  //date: { type: Date, default: Date.now },
   favourite: { type: Boolean, default: false },
   sizes: [
     {

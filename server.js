@@ -3,6 +3,11 @@ const express = require('express');
 const cors = require('cors');
 const mongoose = require('mongoose');
 const dotenv = require('dotenv');
+<<<<<<< HEAD
+=======
+const cookieParser = require('cookie-parser');
+const path = require('path');
+>>>>>>> 1947432b7290a915bf990a373aaa9b55161ea685
 
 dotenv.config();
 
@@ -45,6 +50,7 @@ app.use('/api/orders', orderRoutes);     // Orders route
 
 app.use(express.static('public'));
 
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 app.get('/api/hello', (req, res) => {
   res.json({ message: 'Hello from Express!' });
