@@ -3,7 +3,6 @@ const express = require('express');
 const cors = require('cors');
 const mongoose = require('mongoose');
 const dotenv = require('dotenv');
-const cookieParser = require('cookie-parser');
 
 dotenv.config();
 
@@ -32,7 +31,6 @@ app.use(cors({
   ],
   credentials: true
 }));
-app.use(cookieParser());
 app.use(express.json()); // For parsing JSON request bodies
 
 app.get('/', (req, res) => {
