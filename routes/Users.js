@@ -123,7 +123,7 @@ router.get('/verifySession', async (req, res) => {
     if (!user) {
       return res.status(404).json({ msg: 'User not found' });
     }
-    res.json({ user: { id: user.id, name: user.username, role: user.role } });
+    res.json({ user: { id: user.id, username: user.username, role: user.role } });
   } catch (err) {
     console.error(err.message);
     res.status(401).json({ msg: 'Token is invalid' });
