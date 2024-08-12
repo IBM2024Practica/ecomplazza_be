@@ -65,6 +65,7 @@ router.post(
 );
 
 // Authenticate User
+// Authenticate User
 router.post(
   '/login',
   [
@@ -80,7 +81,7 @@ router.post(
     const { email, password } = req.body;
 
     try {
-      let user = await User.findOne({ email });
+      let user = await User.findOne({ email }).populate('cart.productId').populate('favourites');
       if (!user) {
         return res.status(400).json({ msg: 'Invalid credentials' });
       }
@@ -104,7 +105,7 @@ router.post(
         { expiresIn: '5d' },
         (err, token) => {
           if (err) throw err;
-          res.status(200).json({ token, user: payload.user });
+          res.status(200).json({ token, user: payload.user, cart: user.cart, favourites: user.favourites });
         }
       );
     } catch (err) {
@@ -115,20 +116,99 @@ router.post(
 );
 
 // Verify Session
-router.get('/verifySession', async (req, res) => {
-  const token = req.headers.authorization.split(' ')[1];
+router.get('/verifySession', auth, async (req, res) => {
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    const user = await User.findById(decoded.user.id);
+    const user = await User.findById(req.user.id).populate('cart.productId').populate('favourites');
     if (!user) {
       return res.status(404).json({ msg: 'User not found' });
     }
-    res.json({ user: { id: user.id, username: user.username, role: user.role } });
+    res.json({ user: { id: user.id, username: user.username, role: user.role }, cart: user.cart, favourites: user.favourites });
   } catch (err) {
     console.error(err.message);
     res.status(401).json({ msg: 'Token is invalid' });
   }
 });
+
+router.get('/cart', auth, async (req, res) => {
+  try {
+    const user = await User.findById(req.user.id).populate('cart.productId');
+    res.json(user.cart);
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send('Server error');
+  }
+});
+
+router.post('/cart', auth, async (req, res) => {
+  const { productId, selectedSize, selectedColor, quantity } = req.body;
+
+  try {
+    const user = await User.findById(req.user.id);
+    const existingItemIndex = user.cart.findIndex(
+      (item) => item.productId.toString() === productId && item.selectedSize === selectedSize && item.selectedColor === selectedColor
+    );
+
+    if (existingItemIndex !== -1) {
+      user.cart[existingItemIndex].quantity += quantity;
+    } else {
+      user.cart.push({ productId, selectedSize, selectedColor, quantity });
+    }
+
+    await user.save();
+    res.json(user.cart);
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send('Server error');
+  }
+});
+
+router.delete('/cart/:itemId', auth, async (req, res) => {
+  try {
+    const user = await User.findById(req.user.id);
+    user.cart = user.cart.filter(item => item._id.toString() !== req.params.itemId);
+    await user.save();
+    res.json(user.cart);
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send('Server error');
+  }
+});
+
+router.get('/favourites', auth, async (req, res) => {
+  try {
+    const user = await User.findById(req.user.id).populate('favourites');
+    res.json(user.favourites);
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send('Server error');
+  }
+});
+
+router.post('/favourites', auth, async (req, res) => {
+  const { productId } = req.body;
+
+  try {
+    const user = await User.findById(req.user.id);
+    const isFavourite = user.favourites.includes(productId);
+
+    if (isFavourite) {
+      user.favourites = user.favourites.filter(fav => fav.toString() !== productId);
+    } else {
+      user.favourites.push(productId);
+    }
+
+    await user.save();
+    res.json(user.favourites);
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send('Server error');
+  }
+});
+
+
+// Verify Session
+
+
 
 // Get all users
 router.get('/get', auth, async (req, res) => {
