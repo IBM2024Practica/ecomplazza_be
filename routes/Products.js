@@ -126,6 +126,8 @@ router.get('/products', async (req, res) => {
     const { category, subcategory, minPrice, maxPrice, material } = req.query;
     const query = {};
 
+    console.log('Category:', category); // Verificăm ce categorie ajunge aici
+
     if (category) query.category = new RegExp(`^${category}$`, 'i'); // Case-insensitive regex
     if (subcategory) query.subcategory = { $in: subcategory.split(',') };
     if (minPrice) query.price = { $gte: Number(minPrice) };
@@ -139,6 +141,7 @@ router.get('/products', async (req, res) => {
     res.status(500).send('Server error');
   }
 });
+
 
 // Add to Favourites
 router.post('/favourites/add/:productId', auth, async (req, res) => {
