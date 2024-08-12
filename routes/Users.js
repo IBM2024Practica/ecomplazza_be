@@ -59,12 +59,11 @@ router.post(
       );
     } catch (err) {
       console.error(err.message);
-      res.status(500).send('Server error');
+      res.status(500).json({ error: 'Server error' });
     }
   }
 );
 
-// Authenticate User
 // Authenticate User
 router.post(
   '/login',
@@ -81,9 +80,7 @@ router.post(
     const { email, password } = req.body;
 
     try {
-      console.log("Before populate:", user);
       let user = await User.findOne({ email }).populate('cart.productId').populate('favourites');
-      console.log("After populate:", user);
       if (!user) {
         return res.status(400).json({ msg: 'Invalid credentials' });
       }
@@ -112,7 +109,7 @@ router.post(
       );
     } catch (err) {
       console.error(err.message);
-      res.status(500).send('Server error');
+      res.status(500).json({ error: 'Server error' });
     }
   }
 );
@@ -131,16 +128,18 @@ router.get('/verifySession', auth, async (req, res) => {
   }
 });
 
+// Get User's Cart
 router.get('/cart', auth, async (req, res) => {
   try {
     const user = await User.findById(req.user.id).populate('cart.productId');
     res.json(user.cart);
   } catch (err) {
     console.error(err.message);
-    res.status(500).send('Server error');
+    res.status(500).json({ error: 'Server error' });
   }
 });
 
+// Add to Cart
 router.post('/cart', auth, async (req, res) => {
   const { productId, selectedSize, selectedColor, quantity } = req.body;
 
@@ -160,10 +159,11 @@ router.post('/cart', auth, async (req, res) => {
     res.json(user.cart);
   } catch (err) {
     console.error(err.message);
-    res.status(500).send('Server error');
+    res.status(500).json({ error: 'Server error' });
   }
 });
 
+// Remove from Cart
 router.delete('/cart/:itemId', auth, async (req, res) => {
   try {
     const user = await User.findById(req.user.id);
@@ -172,20 +172,22 @@ router.delete('/cart/:itemId', auth, async (req, res) => {
     res.json(user.cart);
   } catch (err) {
     console.error(err.message);
-    res.status(500).send('Server error');
+    res.status(500).json({ error: 'Server error' });
   }
 });
 
+// Get User's Favourites
 router.get('/favourites', auth, async (req, res) => {
   try {
     const user = await User.findById(req.user.id).populate('favourites');
     res.json(user.favourites);
   } catch (err) {
     console.error(err.message);
-    res.status(500).send('Server error');
+    res.status(500).json({ error: 'Server error' });
   }
 });
 
+// Add/Remove Favourites
 router.post('/favourites', auth, async (req, res) => {
   const { productId } = req.body;
 
@@ -203,14 +205,9 @@ router.post('/favourites', auth, async (req, res) => {
     res.json(user.favourites);
   } catch (err) {
     console.error(err.message);
-    res.status(500).send('Server error');
+    res.status(500).json({ error: 'Server error' });
   }
 });
-
-
-// Verify Session
-
-
 
 // Get all users
 router.get('/get', auth, async (req, res) => {
@@ -219,7 +216,7 @@ router.get('/get', auth, async (req, res) => {
     res.json(users);
   } catch (err) {
     console.error(err.message);
-    res.status(500).send('Server error');
+    res.status(500).json({ error: 'Server error' });
   }
 });
 
@@ -240,13 +237,12 @@ router.put('/:id/role', auth, async (req, res) => {
     res.json(user);
   } catch (err) {
     console.error(err.message);
-    res.status(500).send('Server error');
+    res.status(500).json({ error: 'Server error' });
   }
 });
 
 // Logout
 router.post('/logout', (req, res) => {
-  // Perform any logout operations like invalidating the token on the server if applicable
   res.json({ msg: 'Logged out successfully' });
 });
 
