@@ -120,12 +120,13 @@ router.put(
 );
 
 // routes/products.js
+// routes/products.js
 router.get('/products', async (req, res) => {
   try {
     const { category, subcategory, minPrice, maxPrice, material } = req.query;
     const query = {};
 
-    if (category) query.category = new RegExp(`^${category}$`, 'i');
+    if (category) query.category = new RegExp(`^${category}$`, 'i'); // Case-insensitive regex
     if (subcategory) query.subcategory = { $in: subcategory.split(',') };
     if (minPrice) query.price = { $gte: Number(minPrice) };
     if (maxPrice) query.price = { ...query.price, $lte: Number(maxPrice) };
