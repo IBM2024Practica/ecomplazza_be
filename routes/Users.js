@@ -130,17 +130,21 @@ router.get('/verifySession', auth, async (req, res) => {
     res.status(401).json({ msg: 'Token is invalid' });
   }
 });
-
 // Get User's Cart
 router.get('/cart', auth, async (req, res) => {
   try {
     const user = await User.findById(req.user.id).populate('cart.productId');
+    
+    // Log the cart data that will be sent in the response
+    console.log('Cart data being sent:', user.cart);
+
     res.json(user.cart);
   } catch (err) {
-    console.error(err.message);
+    console.error('Server error while fetching cart:', err.message);
     res.status(500).json({ error: 'Server error' });
   }
 });
+
 
 // Add to Cart
 router.post('/cart', auth, async (req, res) => {
