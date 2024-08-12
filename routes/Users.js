@@ -81,7 +81,10 @@ router.post(
     const { email, password } = req.body;
 
     try {
-      let user = await User.findOne({ email }).populate('cart.productId').populate('favourites');
+      let user = await User.findOne({ email }).populate({
+        path: 'cart.productId',
+        strictPopulate: false
+      }).populate('favourites');
       if (!user) {
         return res.status(400).json({ msg: 'Invalid credentials' });
       }
